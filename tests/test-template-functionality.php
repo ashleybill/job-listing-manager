@@ -40,6 +40,9 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 
 		$meta = get_post_meta( $template_id );
 		foreach ( $meta as $key => $values ) {
+			if ( $key === '_jlm_is_template' ) {
+				continue;
+			}
 			foreach ( $values as $value ) {
 				add_post_meta( $new_post_id, $key, maybe_unserialize( $value ) );
 			}
@@ -50,6 +53,23 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 		$this->assertEquals( 'Test Template', $new_post->post_title );
 		$this->assertEquals( 'Test Location', get_post_meta( $new_post_id, 'job_location', true ) );
 		$this->assertEquals( '50000', get_post_meta( $new_post_id, 'job_salary', true ) );
+		$this->assertEmpty( get_post_meta( $new_post_id, '_jlm_is_template', true ) );
+	}
+
+	public function test_custom_slug_includes_location() {
+		$post_id = wp_insert_post( array(
+			'post_type' => 'job_listing',
+			'post_status' => 'publish',
+			'post_title' => 'Software Engineer',
+		) );
+
+		update_post_meta( $post_id, 'job_location', 'San Francisco' );
+		
+		$post = get_post( $post_id );
+		$slug = jlm_custom_job_slug( '', $post_id, 'publish', 'job_listing' );
+		$expected = sanitize_title( 'Software Engineer San Francisco' );
+		
+		$this->assertEquals( $expected, $slug );
 	}
 
 	public function test_templates_excluded_from_frontend() {

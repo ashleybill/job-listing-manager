@@ -4,7 +4,7 @@ Tags: jobs, employment, careers, job postings
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,12 @@ Features:
 6. Create job postings under Jobs menu
 
 == Changelog ==
+
+= 0.3.0 =
+* Improved template system using meta field instead of custom status
+* Template flag no longer copied when duplicating
+* Custom slugs now include location (e.g., title-location)
+* Added template checkbox in post editor sidebar
 
 = 0.2.0 =
 * Added template system for job listings

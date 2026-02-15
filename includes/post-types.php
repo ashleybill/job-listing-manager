@@ -115,6 +115,9 @@ function jlm_duplicate_template() {
 	if ( $new_post_id ) {
 		$meta = get_post_meta( $post_id );
 		foreach ( $meta as $key => $values ) {
+			if ( $key === '_jlm_is_template' ) {
+				continue;
+			}
 			foreach ( $values as $value ) {
 				add_post_meta( $new_post_id, $key, maybe_unserialize( $value ) );
 			}
@@ -134,6 +137,18 @@ function jlm_duplicate_template() {
 	}
 }
 add_action( 'admin_action_jlm_duplicate_template', 'jlm_duplicate_template' );
+
+function jlm_custom_job_slug( $slug, $post_id, $post_status, $post_type ) {
+	if ( $post_type === 'job_listing' ) {
+		$post = get_post( $post_id );
+		$location = get_post_meta( $post_id, 'job_location', true );
+		if ( $location ) {
+			$slug = sanitize_title( $post->post_title . ' ' . $location );
+		}
+	}
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'jlm_custom_job_slug', 10, 4 );
 
 function jlm_exclude_templates_from_frontend( $query ) {
 	if ( ! is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'job_listing' ) {
