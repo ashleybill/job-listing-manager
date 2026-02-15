@@ -164,10 +164,12 @@ function jlm_update_slug_on_location_change( $post_id ) {
 	if ( $location ) {
 		$new_slug = sanitize_title( $post->post_title . ' ' . $location );
 		if ( $post->post_name !== $new_slug ) {
+			remove_action( 'acf/save_post', 'jlm_update_slug_on_location_change', 20 );
 			wp_update_post( array(
 				'ID' => $post_id,
 				'post_name' => $new_slug,
 			) );
+			add_action( 'acf/save_post', 'jlm_update_slug_on_location_change', 20 );
 		}
 	}
 }
@@ -217,8 +219,19 @@ function jlm_sort_templates_first( $query ) {
 	}
 	
 	if ( $query->get( 'post_type' ) === 'job_listing' && ! isset( $_GET['orderby'] ) ) {
-		$query->set( 'meta_key', '_jlm_is_template' );
-		$query->set( 'orderby', array( 'meta_value' => 'DESC', 'date' => 'DESC' ) );
+		add_filter( 'posts_orderby', 'jlm_custom_orderby', 10, 2 );
 	}
 }
 add_action( 'pre_get_posts', 'jlm_sort_templates_first' );
+
+function jlm_custom_orderby( $orderby, $query ) {
+	if ( ! is_admin() || ! $query->is_main_query() || $query->get( 'post_type' ) !== 'job_listing' ) {
+		return $orderby;
+	}
+	
+	global $wpdb;
+	$orderby = "(SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = {$wpdb->posts}.ID AND meta_key = '_jlm_is_template' LIMIT 1) DESC, {$wpdb->posts}.post_date DESC";
+	
+	remove_filter( 'posts_orderby', 'jlm_custom_orderby', 10 );
+	return $orderby;
+}
