@@ -217,17 +217,7 @@ function jlm_sort_templates_first( $query ) {
 	}
 	
 	if ( $query->get( 'post_type' ) === 'job_listing' && ! isset( $_GET['orderby'] ) ) {
-		$query->set( 'meta_query', array(
-			'relation' => 'OR',
-			array(
-				'key' => '_jlm_is_template',
-				'compare' => 'EXISTS',
-			),
-			array(
-				'key' => '_jlm_is_template',
-				'compare' => 'NOT EXISTS',
-			),
-		) );
+		$query->set( 'meta_key', '_jlm_is_template' );
 		$query->set( 'orderby', array( 'meta_value' => 'DESC', 'date' => 'DESC' ) );
 	}
 }
