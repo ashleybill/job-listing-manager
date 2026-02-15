@@ -5,20 +5,28 @@
 
 class Test_Template_Functionality extends WP_UnitTestCase {
 
-	public function test_template_status_registered() {
-		$status = get_post_status_object( 'template' );
-		$this->assertNotNull( $status );
-		$this->assertEquals( 'Template', $status->label );
+	public function test_template_meta_can_be_set() {
+		$post_id = wp_insert_post( array(
+			'post_type' => 'job_listing',
+			'post_status' => 'draft',
+			'post_title' => 'Test Template',
+		) );
+
+		update_post_meta( $post_id, '_jlm_is_template', '1' );
+		$is_template = get_post_meta( $post_id, '_jlm_is_template', true );
+
+		$this->assertEquals( '1', $is_template );
 	}
 
 	public function test_duplicate_template_creates_draft() {
 		$template_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
-			'post_status' => 'template',
+			'post_status' => 'draft',
 			'post_title' => 'Test Template',
 			'post_content' => 'Template content',
 		) );
 
+		update_post_meta( $template_id, '_jlm_is_template', '1' );
 		add_post_meta( $template_id, 'job_location', 'Test Location' );
 		add_post_meta( $template_id, 'job_salary', '50000' );
 
@@ -47,9 +55,10 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 	public function test_templates_excluded_from_frontend() {
 		$template_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
-			'post_status' => 'template',
+			'post_status' => 'publish',
 			'post_title' => 'Template Post',
 		) );
+		update_post_meta( $template_id, '_jlm_is_template', '1' );
 
 		$published_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
@@ -57,16 +66,19 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 			'post_title' => 'Published Post',
 		) );
 
-		$this->assertIsInt( $template_id );
-		$this->assertIsInt( $published_id );
+		$query = new WP_Query( array(
+			'post_type' => 'job_listing',
+			'post_status' => 'publish',
+			'meta_query' => array(
+				array(
+					'key' => '_jlm_is_template',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+		) );
 
-		$template = get_post( $template_id );
-		$published = get_post( $published_id );
-
-		$this->assertNotNull( $template );
-		$this->assertNotNull( $published );
-		$this->assertEquals( 'template', $template->post_status );
-		$this->assertEquals( 'publish', $published->post_status );
-		$this->assertFalse( get_post_status_object( 'template' )->public );
+		$post_ids = wp_list_pluck( $query->posts, 'ID' );
+		$this->assertTrue( in_array( $published_id, $post_ids ) );
+		$this->assertFalse( in_array( $template_id, $post_ids ) );
 	}
 }

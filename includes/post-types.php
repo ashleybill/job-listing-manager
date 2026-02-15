@@ -24,47 +24,66 @@ function jlm_register_post_types() {
 		'public' => true,
 		'has_archive' => false,
 		'show_in_rest' => true,
-		'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+		'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
 		'menu_icon' => 'dashicons-businessperson',
 		'rewrite' => array( 'slug' => 'job' ),
 	) );
 }
 add_action( 'init', 'jlm_register_post_types' );
 
-function jlm_register_template_status() {
-	register_post_status( 'template', array(
-		'label' => __( 'Template', 'job-listing-manager' ),
-		'public' => false,
-		'exclude_from_search' => true,
-		'show_in_admin_all_list' => true,
-		'show_in_admin_status_list' => true,
-		'label_count' => _n_noop( 'Template <span class="count">(%s)</span>', 'Templates <span class="count">(%s)</span>', 'job-listing-manager' ),
-	) );
+function jlm_add_template_meta_box() {
+	add_meta_box(
+		'jlm_template_meta',
+		__( 'Template', 'job-listing-manager' ),
+		'jlm_template_meta_box_callback',
+		'job_listing',
+		'side',
+		'high'
+	);
 }
-add_action( 'init', 'jlm_register_template_status' );
+add_action( 'add_meta_boxes', 'jlm_add_template_meta_box' );
 
-function jlm_add_template_status_dropdown() {
-	global $post;
-	if ( get_post_type( $post ) === 'job_listing' ) {
-		?>
-		<script>
-		jQuery(document).ready(function($) {
-			if ($('#post_status').length) {
-				$('#post_status').append('<option value="template" ' + ($('#post_status').val() === 'template' ? 'selected' : '') + '>Template</option>');
-			}
-			if ($('.misc-pub-section label').length && $('#post-status-display').text() === 'Template') {
-				$('#post-status-display').text('Template');
-			}
-		});
-		</script>
-		<?php
+function jlm_template_meta_box_callback( $post ) {
+	wp_nonce_field( 'jlm_template_meta', 'jlm_template_nonce' );
+	$is_template = get_post_meta( $post->ID, '_jlm_is_template', true );
+	?>
+	<label>
+		<input type="checkbox" name="jlm_is_template" value="1" <?php checked( $is_template, '1' ); ?> />
+		<?php _e( 'This is a template', 'job-listing-manager' ); ?>
+	</label>
+	<p class="description"><?php _e( 'Templates can be duplicated and are hidden from the frontend.', 'job-listing-manager' ); ?></p>
+	<?php
+}
+
+function jlm_save_template_meta( $post_id ) {
+	if ( ! isset( $_POST['jlm_template_nonce'] ) || ! wp_verify_nonce( $_POST['jlm_template_nonce'], 'jlm_template_meta' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	
+	if ( isset( $_POST['jlm_is_template'] ) ) {
+		update_post_meta( $post_id, '_jlm_is_template', '1' );
+	} else {
+		delete_post_meta( $post_id, '_jlm_is_template' );
 	}
 }
-add_action( 'admin_footer-post.php', 'jlm_add_template_status_dropdown' );
-add_action( 'admin_footer-post-new.php', 'jlm_add_template_status_dropdown' );
+add_action( 'save_post_job_listing', 'jlm_save_template_meta' );
+
+function jlm_display_template_label( $post_states, $post ) {
+	if ( $post->post_type === 'job_listing' && get_post_meta( $post->ID, '_jlm_is_template', true ) ) {
+		$post_states['template'] = __( 'Template', 'job-listing-manager' );
+	}
+	return $post_states;
+}
+add_filter( 'display_post_states', 'jlm_display_template_label', 10, 2 );
 
 function jlm_duplicate_action( $actions, $post ) {
-	if ( $post->post_type === 'job_listing' && $post->post_status === 'template' && current_user_can( 'edit_posts' ) ) {
+	if ( $post->post_type === 'job_listing' && get_post_meta( $post->ID, '_jlm_is_template', true ) && current_user_can( 'edit_posts' ) ) {
 		$actions['duplicate'] = '<a href="' . wp_nonce_url( admin_url( 'admin.php?action=jlm_duplicate_template&post=' . $post->ID ), 'jlm_duplicate_' . $post->ID ) . '">' . __( 'Duplicate', 'job-listing-manager' ) . '</a>';
 	}
 	return $actions;
@@ -118,7 +137,12 @@ add_action( 'admin_action_jlm_duplicate_template', 'jlm_duplicate_template' );
 
 function jlm_exclude_templates_from_frontend( $query ) {
 	if ( ! is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'job_listing' ) {
-		$query->set( 'post_status', array( 'publish' ) );
+		$meta_query = $query->get( 'meta_query' ) ?: array();
+		$meta_query[] = array(
+			'key' => '_jlm_is_template',
+			'compare' => 'NOT EXISTS',
+		);
+		$query->set( 'meta_query', $meta_query );
 	}
 }
 add_action( 'pre_get_posts', 'jlm_exclude_templates_from_frontend' );
