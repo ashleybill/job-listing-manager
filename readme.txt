@@ -4,7 +4,7 @@ Tags: jobs, employment, careers, job postings
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ Features:
 * Automatic job expiration based on closing date
 * Application method configuration (mailto or Forminator form)
 * Forminator form integration with custom styling
+* Template system for easy job listing duplication
 * Block editor support with custom blocks
 * Settings page for application method configuration
 
@@ -34,6 +35,11 @@ Features:
 6. Create job postings under Jobs menu
 
 == Changelog ==
+
+= 0.2.0 =
+* Added template system for job listings
+* Templates can be duplicated to create new job postings
+* Templates excluded from frontend display
 
 = 0.1.0 =
 * Initial release
