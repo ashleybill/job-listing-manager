@@ -1,0 +1,12 @@
+{
+	"core": "WordPress/WordPress#6.8",
+	"plugins": [
+		".",
+		"https://downloads.wordpress.org/plugin/secure-custom-fields.latest-stable.zip"
+	],
+	"themes": [],
+	"config": {
+		"WP_DEBUG": true,
+		"SCRIPT_DEBUG": true
+	}
+}

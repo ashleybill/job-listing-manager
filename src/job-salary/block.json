@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "job-listing-manager/job-salary",
+	"version": "0.1.0",
+	"title": "Job Salary",
+	"category": "job-listing-blocks",
+	"icon": "money-alt",
+	"description": "Display job salary range",
+	"supports": {
+		"html": false,
+		"spacing": {
+			"padding": true,
+			"margin": true
+		}
+	},
+	"usesContext": ["postId", "postType"],
+	"textdomain": "job-listing-manager",
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

@@ -1,0 +1,14 @@
+.git
+.gitignore
+.distignore
+node_modules
+vendor
+tests
+phpunit.xml
+composer.json
+composer.lock
+package.json
+package-lock.json
+.phpunit.result.cache
+.wp-env.json
+src

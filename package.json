@@ -1,0 +1,32 @@
+{
+	"name": "job-listing-manager",
+	"version": "0.1.0",
+	"description": "WordPress plugin for managing job postings",
+	"author": "AJB",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --blocks-manifest && npm run copy-assets",
+		"copy-assets": "mkdir -p build/assets && cp -r assets/* build/assets/",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "rm -f job-listing-manager.zip && npm run build && wp-scripts plugin-zip",
+		"start": "wp-scripts start --blocks-manifest",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"env:destroy": "wp-env destroy",
+		"test:php": "npm run build && wp-env run tests-cli --env-cwd=wp-content/plugins/job-listing-manager composer update && wp-env run tests-cli --env-cwd=wp-content/plugins/job-listing-manager vendor/bin/phpunit"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "latest",
+		"@wordpress/blocks": "latest",
+		"@wordpress/components": "latest",
+		"@wordpress/i18n": "latest"
+	},
+	"devDependencies": {
+		"@wordpress/env": "^10.9.0",
+		"@wordpress/scripts": "^31.4.0"
+	}
+}

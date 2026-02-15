@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "job-listing-manager/job-apply-button",
+  "version": "0.1.0",
+  "title": "Job Apply Button",
+  "category": "job-listing-blocks",
+  "icon": "yes",
+  "description": "Button to apply for job with position and location parameters",
+  "attributes": {
+    "buttonText": {
+      "type": "string",
+      "default": "Apply Now"
+    },
+    "applyPageId": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "supports": {
+    "html": false,
+    "spacing": {
+      "padding": true,
+      "margin": true
+    },
+    "color": {
+      "background": true,
+      "text": true
+    },
+    "typography": {
+      "fontSize": true
+    }
+  },
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
+  "textdomain": "job-listing-manager",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

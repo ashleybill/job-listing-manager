@@ -1,0 +1,1 @@
+(()=>{"use strict";const o=window.wp.blocks,t=window.wp.blockEditor,e=window.wp.coreData,s=window.ReactJSXRuntime;(0,o.registerBlockType)("job-listing-manager/job-salary",{edit:({context:o})=>{const i=(0,t.useBlockProps)(),{postId:r,postType:n}=o,[a]=(0,e.useEntityProp)("postType",n,"meta",r),c=a?.job_salary;return(0,s.jsx)("div",{...i,children:c||"No salary set"})}})})();
