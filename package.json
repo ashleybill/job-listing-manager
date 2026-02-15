@@ -1,6 +1,6 @@
 {
 	"name": "job-listing-manager",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "WordPress plugin for managing job postings",
 	"author": "AJB",
 	"license": "GPL-2.0-or-later",

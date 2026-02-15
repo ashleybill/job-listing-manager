@@ -161,3 +161,51 @@ function jlm_exclude_templates_from_frontend( $query ) {
 	}
 }
 add_action( 'pre_get_posts', 'jlm_exclude_templates_from_frontend' );
+
+function jlm_add_location_column( $columns ) {
+	$new_columns = array();
+	foreach ( $columns as $key => $value ) {
+		$new_columns[ $key ] = $value;
+		if ( $key === 'title' ) {
+			$new_columns['job_location'] = __( 'Location', 'job-listing-manager' );
+		}
+	}
+	return $new_columns;
+}
+add_filter( 'manage_job_listing_posts_columns', 'jlm_add_location_column' );
+
+function jlm_display_location_column( $column, $post_id ) {
+	if ( $column === 'job_location' ) {
+		$location = get_post_meta( $post_id, 'job_location', true );
+		echo $location ? esc_html( $location ) : '—';
+	}
+}
+add_action( 'manage_job_listing_posts_custom_column', 'jlm_display_location_column', 10, 2 );
+
+function jlm_location_column_sortable( $columns ) {
+	$columns['job_location'] = 'job_location';
+	return $columns;
+}
+add_filter( 'manage_edit-job_listing_sortable_columns', 'jlm_location_column_sortable' );
+
+function jlm_sort_templates_first( $query ) {
+	if ( ! is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+	
+	if ( $query->get( 'post_type' ) === 'job_listing' && ! isset( $_GET['orderby'] ) ) {
+		$query->set( 'meta_query', array(
+			'relation' => 'OR',
+			array(
+				'key' => '_jlm_is_template',
+				'compare' => 'EXISTS',
+			),
+			array(
+				'key' => '_jlm_is_template',
+				'compare' => 'NOT EXISTS',
+			),
+		) );
+		$query->set( 'orderby', array( 'meta_value' => 'DESC', 'date' => 'DESC' ) );
+	}
+}
+add_action( 'pre_get_posts', 'jlm_sort_templates_first' );
