@@ -150,6 +150,29 @@ function jlm_custom_job_slug( $slug, $post_id, $post_status, $post_type ) {
 }
 add_filter( 'wp_unique_post_slug', 'jlm_custom_job_slug', 10, 4 );
 
+function jlm_update_slug_on_location_change( $post_id ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	
+	$post = get_post( $post_id );
+	if ( ! $post || $post->post_type !== 'job_listing' ) {
+		return;
+	}
+	
+	$location = get_post_meta( $post_id, 'job_location', true );
+	if ( $location ) {
+		$new_slug = sanitize_title( $post->post_title . ' ' . $location );
+		if ( $post->post_name !== $new_slug ) {
+			wp_update_post( array(
+				'ID' => $post_id,
+				'post_name' => $new_slug,
+			) );
+		}
+	}
+}
+add_action( 'acf/save_post', 'jlm_update_slug_on_location_change', 20 );
+
 function jlm_exclude_templates_from_frontend( $query ) {
 	if ( ! is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'job_listing' ) {
 		$meta_query = $query->get( 'meta_query' ) ?: array();
