@@ -12,7 +12,7 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 	}
 
 	public function test_duplicate_template_creates_draft() {
-		$template_id = $this->factory->post->create( array(
+		$template_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
 			'post_status' => 'template',
 			'post_title' => 'Test Template',
@@ -45,23 +45,28 @@ class Test_Template_Functionality extends WP_UnitTestCase {
 	}
 
 	public function test_templates_excluded_from_frontend() {
-		$template_id = $this->factory->post->create( array(
+		$template_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
 			'post_status' => 'template',
+			'post_title' => 'Template Post',
 		) );
 
-		$published_id = $this->factory->post->create( array(
+		$published_id = wp_insert_post( array(
 			'post_type' => 'job_listing',
 			'post_status' => 'publish',
+			'post_title' => 'Published Post',
 		) );
 
-		$query = new WP_Query( array(
-			'post_type' => 'job_listing',
-			'post_status' => array( 'publish' ),
-		) );
+		$this->assertIsInt( $template_id );
+		$this->assertIsInt( $published_id );
 
-		$post_ids = wp_list_pluck( $query->posts, 'ID' );
-		$this->assertContains( $published_id, $post_ids );
-		$this->assertNotContains( $template_id, $post_ids );
+		$template = get_post( $template_id );
+		$published = get_post( $published_id );
+
+		$this->assertNotNull( $template );
+		$this->assertNotNull( $published );
+		$this->assertEquals( 'template', $template->post_status );
+		$this->assertEquals( 'publish', $published->post_status );
+		$this->assertFalse( get_post_status_object( 'template' )->public );
 	}
 }
