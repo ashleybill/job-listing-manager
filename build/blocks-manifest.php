@@ -53,6 +53,12 @@ return array(
 		'category' => 'job-listing-blocks',
 		'icon' => 'calendar-alt',
 		'description' => 'Display job closing date',
+		'attributes' => array(
+			'noDateMessage' => array(
+				'type' => 'string',
+				'default' => 'Open until filled'
+			)
+		),
 		'supports' => array(
 			'html' => false,
 			'spacing' => array(

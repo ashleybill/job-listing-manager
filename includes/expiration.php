@@ -20,6 +20,16 @@ function jlm_check_expired_jobs() {
 		'post_status' => 'publish',
 		'posts_per_page' => -1,
 		'meta_query' => array(
+			'relation' => 'AND',
+			array(
+				'key' => 'job_closing_date',
+				'compare' => 'EXISTS',
+			),
+			array(
+				'key' => 'job_closing_date',
+				'value' => '',
+				'compare' => '!=',
+			),
 			array(
 				'key' => 'job_closing_date',
 				'value' => date( 'Y-m-d' ),

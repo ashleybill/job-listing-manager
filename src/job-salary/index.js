@@ -1,14 +1,20 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 registerBlockType('job-listing-manager/job-salary', {
 	edit: ({ context }) => {
 		const blockProps = useBlockProps();
 		const { postId, postType } = context;
 
-		const [meta] = useEntityProp('postType', postType, 'meta', postId);
-		const salary = meta?.job_salary;
+		const salary = useSelect(
+			(select) => {
+				if (!postId || !postType) return null;
+				const meta = select('core/editor').getEditedPostAttribute('meta');
+				return meta?.job_salary;
+			},
+			[postId, postType]
+		);
 
 		return (
 			<div {...blockProps}>
