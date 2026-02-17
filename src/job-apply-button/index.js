@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 registerBlockType('job-listing-manager/job-apply-button', {
 	edit: ({ attributes, setAttributes, context }) => {
 		const blockProps = useBlockProps({
-			className: 'wp-block-button'
+			className: 'wp-block-group is-content-justification-center is-layout-flex'
 		});
 		const { buttonText, applyPageId } = attributes;
 
@@ -45,6 +45,7 @@ registerBlockType('job-listing-manager/job-apply-button', {
 						value={buttonText}
 						onChange={(value) => setAttributes({ buttonText: value })}
 						placeholder={__('Apply Now', 'job-listing-manager')}
+						allowedFormats={[]}
 					/>
 				</div>
 			</>

@@ -47,7 +47,7 @@ if ( $method === 'form' ) {
 	$href = esc_attr( $mailto );
 }
 ?>
-<div <?php echo get_block_wrapper_attributes( array( 'class' => 'wp-block-button' ) ); ?>>
+<div <?php echo get_block_wrapper_attributes( array( 'class' => 'wp-block-group is-content-justification-center is-layout-flex' ) ); ?>>
 	<a href="<?php echo $href; ?>" class="wp-block-button__link wp-element-button">
 		<?php echo esc_html( $button_text ); ?>
 	</a>

@@ -19,6 +19,12 @@
 	},
 	"supports": {
 		"html": false,
+		"layout": {
+			"default": {
+				"type": "flex",
+				"justifyContent": "center"
+			}
+		},
 		"spacing": {
 			"padding": true,
 			"margin": true

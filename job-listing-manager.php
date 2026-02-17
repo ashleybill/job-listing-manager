@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Job Listing Manager
  * Description:       Manage job postings with custom post types and blocks
- * Version:           0.3.1
+ * Version:           0.3.2
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Author:            AJB

@@ -4,7 +4,7 @@ Tags: jobs, employment, careers, job postings
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,9 @@ Features:
 6. Create job postings under Jobs menu
 
 == Changelog ==
+
+= 0.3.2 =
+* fix bug with apply button rendering
 
 = 0.3.1 =
 * Added location column to admin job listings view
